@@ -7,7 +7,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_prefix="", extra="ignore")
 
-    app_name: str = Field(default="Article Workflow API", validation_alias="API_TITLE")
+    app_name: str = Field(default="IntelFlow API", validation_alias="API_TITLE")
     n8n_webhook_url: AnyHttpUrl = (
         "https://mazharul5868.app.n8n.cloud/webhook/process-article"
     )

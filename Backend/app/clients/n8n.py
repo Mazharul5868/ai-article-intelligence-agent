@@ -1,3 +1,5 @@
+import json
+
 import httpx
 from fastapi import HTTPException
 
@@ -27,11 +29,28 @@ class N8nClient:
                 timeout=self._settings.n8n_timeout_seconds,
             )
 
-            if response.status_code != 200:
-                error_detail = response.json().get("error", response.text)
-                raise HTTPException(status_code=response.status_code, detail=error_detail)
+            # Safely attempt JSON parsing without crashing
+            try:
+                body = response.json()
+            except (json.JSONDecodeError, ValueError):
+                body = None
 
-            return ProcessArticleResponse.model_validate(response.json())
+            if response.status_code != 200:
+                if isinstance(body, dict):
+                    detail = body.get("message") or body.get("error") or str(body)
+                elif response.text.strip():
+                    detail = response.text.strip()[:300]
+                else:
+                    detail = f"Workflow failed with status code {response.status_code}."
+                raise HTTPException(status_code=response.status_code, detail=detail)
+
+            if not isinstance(body, dict):
+                raise HTTPException(
+                    status_code=502,
+                    detail="Workflow completed without returning valid JSON data.",
+                )
+
+            return ProcessArticleResponse.model_validate(body)
 
         except httpx.TimeoutException as err:
             raise HTTPException(

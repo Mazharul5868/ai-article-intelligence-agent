@@ -1,0 +1,188 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design system definition — "Aurora Analyst" direction.
+ * Deep ink surface, glassy panels, mint-teal brand, warm amber accent.
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@theme {
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Fraunces", ui-serif, Georgia, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+:root {
+  --radius: 0.75rem;
+
+  /* Aurora analyst palette (dark-first, single theme) */
+  --background: oklch(0.148 0.012 258);
+  --foreground: oklch(0.94 0.008 80);
+  --card: oklch(0.19 0.014 258);
+  --card-foreground: oklch(0.94 0.008 80);
+  --popover: oklch(0.19 0.014 258);
+  --popover-foreground: oklch(0.94 0.008 80);
+  --primary: oklch(0.81 0.093 168);
+  --primary-foreground: oklch(0.148 0.012 258);
+  --secondary: oklch(0.24 0.014 258);
+  --secondary-foreground: oklch(0.94 0.008 80);
+  --muted: oklch(0.24 0.014 258);
+  --muted-foreground: oklch(0.64 0.014 90);
+  --accent: oklch(0.81 0.104 75);
+  --accent-foreground: oklch(0.148 0.012 258);
+  --destructive: oklch(0.62 0.19 25);
+  --destructive-foreground: oklch(0.96 0.01 80);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 10%);
+  --ring: oklch(0.81 0.093 168 / 60%);
+  --chart-1: oklch(0.81 0.093 168);
+  --chart-2: oklch(0.81 0.104 75);
+  --chart-3: oklch(0.7 0.1 220);
+  --chart-4: oklch(0.72 0.12 320);
+  --chart-5: oklch(0.76 0.09 140);
+  --sidebar: oklch(0.17 0.013 258);
+  --sidebar-foreground: oklch(0.94 0.008 80);
+  --sidebar-primary: oklch(0.81 0.093 168);
+  --sidebar-primary-foreground: oklch(0.148 0.012 258);
+  --sidebar-accent: oklch(0.24 0.014 258);
+  --sidebar-accent-foreground: oklch(0.94 0.008 80);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.81 0.093 168 / 60%);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+/* Aurora ambient background */
+@keyframes auroraShift {
+  0% {
+    transform: translate3d(-4%, -2%, 0) scale(1.05);
+    opacity: 0.75;
+  }
+  50% {
+    transform: translate3d(5%, 3%, 0) scale(1.15);
+    opacity: 0.95;
+  }
+  100% {
+    transform: translate3d(-2%, 1%, 0) scale(1.05);
+    opacity: 0.8;
+  }
+}
+
+@keyframes auroraDrift {
+  0% {
+    transform: translate3d(3%, 4%, 0) scale(1.1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate3d(-5%, -3%, 0) scale(1.2);
+    opacity: 0.85;
+  }
+}
+
+@keyframes pulseDot {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes riseIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@utility aurora {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(70px);
+  will-change: transform, opacity;
+  pointer-events: none;
+}
+
+@utility aur-1 {
+  animation: auroraShift 13s ease-in-out infinite;
+}
+
+@utility aur-2 {
+  animation: auroraDrift 17s ease-in-out infinite;
+}
+
+@utility aur-3 {
+  animation: auroraShift 15s ease-in-out infinite reverse;
+}
+
+@utility pulse-dot {
+  animation: pulseDot 1.6s ease-in-out infinite;
+}
+
+@utility rise-in {
+  animation: riseIn 0.5s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
