@@ -7,10 +7,6 @@ from app.config import Settings
 from app.schemas import ProcessArticleRequest, ProcessArticleResponse
 
 
-class N8nWebhookError(Exception):
-    """Raised when the n8n webhook cannot produce a valid result."""
-
-
 class N8nClient:
     def __init__(self, http_client: httpx.AsyncClient, settings: Settings) -> None:
         self._http_client = http_client
@@ -19,7 +15,7 @@ class N8nClient:
     async def process_article(self, request: ProcessArticleRequest) -> ProcessArticleResponse:
         headers = {"Accept": "application/json"}
         if self._settings.n8n_webhook_token:
-            headers["Authorization"] = f"Bearer {self._settings.n8n_webhook_token}"
+            headers["n8n_webhook_token"] = self._settings.n8n_webhook_token.get_secret_value()
 
         try:
             response = await self._http_client.post(
@@ -37,7 +33,12 @@ class N8nClient:
 
             if response.status_code != 200:
                 if isinstance(body, dict):
-                    detail = body.get("message") or body.get("error") or str(body)
+                    detail = (
+                        body.get("detail")
+                        or body.get("error")
+                        or body.get("message")
+                        or str(body)
+                    )
                 elif response.text.strip():
                     detail = response.text.strip()[:300]
                 else:

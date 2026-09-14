@@ -1,6 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, Request, status
 
-from app.clients.n8n import N8nWebhookError
 from app.schemas import ProcessArticleRequest, ProcessArticleResponse
 from app.services import ArticleService
 
@@ -21,10 +20,4 @@ async def process_article(
     payload: ProcessArticleRequest,
     service: ArticleService = Depends(get_article_service),
 ) -> ProcessArticleResponse:
-    try:
         return await service.process(payload)
-    except N8nWebhookError as error:
-        raise HTTPException(
-            status_code=status.HTTP_502_BAD_GATEWAY,
-            detail="The article workflow is currently unavailable",
-        ) from error

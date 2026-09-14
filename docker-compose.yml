@@ -1,0 +1,113 @@
+services:
+  caddy:
+    image: caddy:latest
+    container_name: intelflow-proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "5678:5678"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - intelflow-net
+    depends_on:
+      - backend
+      - n8n
+
+  backend:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
+    container_name: intelflow-backend
+    restart: unless-stopped
+    environment:
+      - PORT=8000
+      - N8N_WEBHOOK_URL=${N8N_WEBHOOK_URL}
+      - N8N_WEBHOOK_TOKEN=${N8N_WEBHOOK_TOKEN}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
+      - API_TITLE=IntelFlow API
+      - LOG_LEVEL=INFO
+    networks:
+      - intelflow-net
+    depends_on:
+      - n8n
+  
+  postgres:
+    image: postgres:16-alpine
+    container_name: intelflow-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-n8n_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-n8n_db}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-n8n_user} -d ${POSTGRES_DB:-n8n_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - intelflow-net
+
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest
+    container_name: intelflow-n8n
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - N8N_PORT=5678
+      - N8N_WEBHOOK_URL=http://localhost:5678/
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+      - GENERIC_TIMEZONE=UTC
+      # Proxy & Rate Limiting Fix
+      - N8N_PROXY_HOPS=1
+      - N8N_TRUST_PROXY=true
+      # Deprecation updates
+      - N8N_UNVERIFIED_PACKAGES_ENABLED=true
+      - N8N_RUNNERS_TASK_TIMEOUT=300
+      - N8N_COMPRESSION_NODE_MAX_DECOMPRESSED_SIZE_BYTES=2147483648
+      - N8N_COMPRESSION_NODE_MAX_ZIP_ENTRIES=5000
+      # Execution pruning
+      - EXECUTIONS_DATA_PRUNE=true
+      - EXECUTIONS_DATA_MAX_AGE=168
+      - EXECUTIONS_DATA_PRUNE_MAX_COUNT=50000
+      - EXECUTIONS_DATA_SAVE_ON_ERROR=all      # Keep all node details when a workflow fails
+      - EXECUTIONS_DATA_SAVE_ON_SUCCESS=none   # Don't save node-by-node bodies for successful runs
+      - EXECUTIONS_DATA_SAVE_MANUAL_EXECUTIONS=true
+      # Postgres Database Configuration
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=postgres
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=${POSTGRES_DB:-n8n_db}
+      - DB_POSTGRESDB_USER=${POSTGRES_USER:-n8n_user}
+      - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - n8n_storage:/home/node/.n8n
+    networks:
+      - intelflow-net
+    depends_on:
+      postgres:
+        condition: service_healthy
+  
+  adminer:
+    image: adminer:latest
+    container_name: intelflow-adminer
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    networks:
+      - intelflow-net
+
+volumes:
+  postgres_data:
+  n8n_storage:
+  caddy_data:
+  caddy_config:
+
+networks:
+  intelflow-net:
+    driver: bridge
