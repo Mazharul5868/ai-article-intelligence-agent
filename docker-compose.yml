@@ -60,8 +60,9 @@ services:
     environment:
       - NODE_ENV=production
       - N8N_PORT=5678
-      - N8N_WEBHOOK_URL=http://localhost:5678/
+      - N8N_WEBHOOK_URL=${N8N_WEBHOOK_URL}
       - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+      - N8N_SECURE_COOKIE=${N8N_SECURE_COOKIE}
       - GENERIC_TIMEZONE=UTC
       # Proxy & Rate Limiting Fix
       - N8N_PROXY_HOPS=1
