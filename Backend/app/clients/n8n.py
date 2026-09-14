@@ -15,7 +15,7 @@ class N8nClient:
     async def process_article(self, request: ProcessArticleRequest) -> ProcessArticleResponse:
         headers = {"Accept": "application/json"}
         if self._settings.n8n_webhook_token:
-            headers["n8n_webhook_token"] = self._settings.n8n_webhook_token.get_secret_value()
+            headers["n8n-webhook-token"] = self._settings.n8n_webhook_token.get_secret_value()
 
         try:
             response = await self._http_client.post(
