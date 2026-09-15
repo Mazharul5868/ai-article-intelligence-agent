@@ -1,5 +1,8 @@
 services:
   caddy:
+    build:
+      context: .
+      dockerfile: Dockerfile.proxy
     image: caddy:latest
     container_name: intelflow-proxy
     restart: unless-stopped
@@ -7,6 +10,8 @@ services:
       - "80:80"
       - "443:443"
       - "5678:5678"
+    environment: 
+      - DUCKDNS_TOKEN
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data

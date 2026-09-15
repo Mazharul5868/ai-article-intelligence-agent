@@ -1,9 +1,13 @@
-http://132.145.61.207 {
+ai-article-workflow.duckdns.org {
+    tls {
+        dns duckdns {env.DUCKDNS_TOKEN}
+    }
     reverse_proxy backend:8000
 }
 
-http://132.145.61.207:5678 {
-    reverse_proxy n8n:5678 {
-        flush_interval -1
+n8n.ai-article-workflow.duckdns.org {
+    tls {
+        dns duckdns {env.DUCKDNS_TOKEN}
     }
+    reverse_proxy n8n:5678
 }
