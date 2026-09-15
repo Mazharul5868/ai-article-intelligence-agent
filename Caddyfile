@@ -1,8 +1,8 @@
-http://localhost:80 {
+http://132.145.61.207 {
     reverse_proxy backend:8000
 }
 
-http://localhost:5678 {
+http://132.145.61.207:5678 {
     reverse_proxy n8n:5678 {
         flush_interval -1
     }
